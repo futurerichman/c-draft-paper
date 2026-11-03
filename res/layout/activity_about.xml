@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v1.14-UI：关于作者页（纯静态展示，深色背景与主界面一致） -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#1e1e1e"
+    android:gravity="center"
+    android:paddingHorizontal="24dp">
+
+    <!-- 大标题 -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="C语言编译器"
+        android:textSize="28sp"
+        android:textColor="#d4d4d4" />
+
+    <!-- 主文案 -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="软件由莫永瀚和他的ai朋友们开发"
+        android:textSize="16sp"
+        android:textColor="#9cdcfe"
+        android:gravity="center" />
+
+    <!-- 版本号小字：由 AboutActivity 从包信息读取，避免以后发版忘了同步 -->
+    <TextView
+        android:id="@+id/tvAboutVersion"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="v1.14-UI"
+        android:textSize="12sp"
+        android:textColor="#8a8a8a" />
+</LinearLayout>
