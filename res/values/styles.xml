@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="AppTheme" parent="@android:style/Theme.Material.NoActionBar">
+        <!-- v1.28.8：全屏适配 —— 状态栏/导航栏透明，配合 MainActivity 边到边窗口铺满 -->
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowBackground">#1e1e1e</item>
+    </style>
+</resources>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v1.14-UI：工具栏「⋮」按钮的弹出菜单
+     v1.21-UI：背景功能（选择图片/视频、透明度）从工具栏移入本菜单
+     v1.24：新增「视频背景图层设置」项，用于调整视频背景图层（临时置顶验证 / 还原）
+     v1.28：新增「视频背景模式」（全屏模式 / 编辑区模式，二选一） -->
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/action_bg"
+        android:title="设置背景（图片/视频）" />
+    <item
+        android:id="@+id/action_bg_opacity"
+        android:title="背景透明度" />
+    <item
+        android:id="@+id/action_bg_video_mode"
+        android:title="视频背景模式" />
+    <item
+        android:id="@+id/action_bg_layer_test"
+        android:title="视频背景图层设置" />
+    <item
+        android:id="@+id/action_about"
+        android:title="关于作者" />
+</menu>

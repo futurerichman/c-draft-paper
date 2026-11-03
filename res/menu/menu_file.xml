@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v1.13-UI：工具栏「文件」按钮的弹出菜单（原「新建」「打开」「保存」三个按钮合并而来） -->
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/action_new"
+        android:title="新建" />
+    <item
+        android:id="@+id/action_open"
+        android:title="打开" />
+    <item
+        android:id="@+id/action_save"
+        android:title="保存" />
+</menu>

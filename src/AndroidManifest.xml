@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.ccode.mintest"
+    android:versionCode="63"
+    android:versionName="1.28.25">
+    <uses-sdk android:minSdkVersion="26" android:targetSdkVersion="34" />
+    <!-- v1.22-UI：全面屏适配
+         ① resizeableActivity=true + maxAspectRatio=3.0：允许应用在任意屏幕比例下
+            全屏铺满，不再被系统 letterbox 加黑边（覆盖 20:9 / 21:9 等全面屏）；
+         ② 刘海/挖孔屏：MainActivity 声明 shortEdges，内容延伸到挖孔区域。 -->
+    <application
+        android:label="c语言草稿纸"
+        android:theme="@style/AppTheme"
+        android:allowBackup="false"
+        android:resizeableActivity="true"
+        android:maxAspectRatio="3.0">
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:windowSoftInputMode="adjustResize"
+            android:windowLayoutInDisplayCutoutMode="shortEdges">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- v1.14-UI：关于作者页，仅由本应用内部启动，不对外暴露 -->
+        <activity
+            android:name=".AboutActivity"
+            android:exported="false" />
+    </application>
+</manifest>
