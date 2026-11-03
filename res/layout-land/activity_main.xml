@@ -1,0 +1,405 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  v1.11-UI：横屏布局 —— 控制台从底部移到屏幕右侧，编辑区占左侧。
+  本文件与 res/layout/activity_main.xml（竖屏）保持「同一套 view id」，
+  因此 MainActivity 的 findViewById / 收起展开逻辑无需任何改动即可复用。
+
+  v1.28：根 FrameLayout 分层 + 视频双模式：
+    图层1：vvBgFull 全屏视频（全屏模式，不压缩、centerCrop）
+    图层2：UI（背景透明；工具栏/控制台/符号栏不透明）
+    编辑区 editorContainer 内保留 ivBg 图片、vvBg 编辑区模式视频（v1.24 方式）。
+  同时清理旧版横屏残留 UI（背景按钮、字号 +/-、旧欢迎语）。
+-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#1e1e1e">
+
+    <!-- ===== 全屏视频层（全屏模式，最低图层） ===== -->
+    <TextureView
+        android:id="@+id/vvBgFull"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" />
+
+    <!-- ===== UI 层（背景透明；工具栏/控制台/符号栏不透明） ===== -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:background="@android:color/transparent"
+        android:clickable="true"
+        android:focusable="true">
+
+        <!-- ==================== 左侧：工具栏 + 编辑区 + 符号栏 ==================== -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="58"
+            android:orientation="vertical"
+            android:background="@android:color/transparent">
+
+            <!-- 顶部工具栏 -->
+            <LinearLayout
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:background="#2d2d30"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="6dp"
+                android:gravity="center_vertical">
+
+                <!-- v1.13-UI：原「新建」「打开」「保存」三按钮合并为一个「文件」按钮，点开是弹出菜单 -->
+                <Button
+                    android:id="@+id/btnFile"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="6dp"
+                    android:text="文件"
+                    android:textSize="14sp"
+                    android:textColor="#ffffff"
+                    android:background="@drawable/btn_bg"
+                    android:paddingHorizontal="10dp"
+                    android:minWidth="56dp" />
+
+                <Button
+                    android:id="@+id/btnRun"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="运行"
+                    android:textSize="14sp"
+                    android:textColor="#ffffff"
+                    android:background="@drawable/btn_bg_run"
+                    android:paddingHorizontal="10dp"
+                    android:minWidth="56dp" />
+
+                <!-- v1.28.7：把单步执行功能独立放到工具栏上，复用现有单步调试逻辑 -->
+                <Button
+                    android:id="@+id/btnStepToolbar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    android:text="步过"
+                    android:textSize="14sp"
+                    android:textColor="#ffffff"
+                    android:background="@drawable/btn_bg"
+                    android:paddingHorizontal="10dp"
+                    android:minWidth="56dp" />
+
+                <!-- v1.14-UI：更多菜单（背景功能入口在菜单里） -->
+                <TextView
+                    android:id="@+id/btnMore"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    android:text="⋮"
+                    android:textSize="18sp"
+                    android:textColor="#ffffff"
+                    android:background="@drawable/btn_bg"
+                    android:paddingHorizontal="8dp"
+                    android:paddingVertical="4dp"
+                    android:gravity="center" />
+
+                <TextView
+                    android:id="@+id/tvFile"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="8dp"
+                    android:text="untitled.c"
+                    android:textSize="13sp"
+                    android:textColor="#9cdcfe"
+                    android:gravity="end"
+                    android:ellipsize="end"
+                    android:maxLines="1" />
+
+                <TextView
+                    android:id="@+id/btnToggleToolbar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="6dp"
+                    android:text="收起"
+                    android:textSize="12sp"
+                    android:textColor="#ffffff"
+                    android:background="@drawable/btn_bg"
+                    android:paddingHorizontal="10dp"
+                    android:paddingVertical="6dp" />
+            </LinearLayout>
+
+            <!-- 工具栏收起后的窄条（默认隐藏） -->
+            <LinearLayout
+                android:id="@+id/toolbarCollapsed"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:background="#2d2d30"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="3dp"
+                android:gravity="center_vertical"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/btnShowToolbar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="▼ 展开工具栏"
+                    android:textSize="12sp"
+                    android:textColor="#9cdcfe"
+                    android:paddingHorizontal="10dp"
+                    android:paddingVertical="4dp" />
+            </LinearLayout>
+
+            <!-- 代码编辑区（背景透明；内部保留图片/编辑区模式视频） -->
+            <FrameLayout
+                android:id="@+id/editorContainer"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:background="@android:color/transparent">
+
+                <!-- 图片背景（v1.24 方式，只在编辑区） -->
+                <ImageView
+                    android:id="@+id/ivBg"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    android:visibility="gone"
+                    android:contentDescription="代码区背景图" />
+
+                <!-- 编辑区模式视频（v1.24 方式，会随编辑区/旋转改变比例） -->
+                <TextureView
+                    android:id="@+id/vvBg"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:visibility="gone" />
+
+                <com.ccode.mintest.CCodeEditText
+                    android:id="@+id/etCode"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@android:color/transparent"
+                    android:textColor="#d4d4d4"
+                    android:textColorHint="#6a6a6a"
+                    android:textSize="14sp"
+                    android:typeface="monospace"
+                    android:gravity="top|start"
+                    android:paddingStart="54dp"
+                    android:paddingEnd="10dp"
+                    android:paddingVertical="8dp"
+                    android:hint="在这里输入 C 语言代码…"
+                    android:inputType="textMultiLine"
+                    android:scrollbars="vertical"
+                    android:overScrollMode="ifContentScrolls" />
+
+                <!-- v1.28.9：编辑区左侧行号栏（覆盖 etCode 左 44dp 区域，文本已用 paddingStart 避让） -->
+                <com.ccode.mintest.CLineNumberView
+                    android:id="@+id/lineNumbers"
+                    android:layout_width="44dp"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="left|top" />
+            </FrameLayout>
+
+            <!-- 常用符号栏 -->
+            <HorizontalScrollView
+                android:id="@+id/symbolBar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#2d2d30"
+                android:scrollbars="none">
+
+                <LinearLayout
+                    android:id="@+id/symbolRow"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:paddingVertical="4dp"
+                    android:paddingStart="4dp"
+                    android:paddingEnd="4dp" />
+            </HorizontalScrollView>
+
+            <!-- v1.18：单步调试控制条（默认隐藏，调试时显示） -->
+            <LinearLayout
+                android:id="@+id/debugBar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:background="#243b3b"
+                android:padding="4dp"
+                android:gravity="center_vertical"
+                android:visibility="gone">
+
+                <Button
+                    android:id="@+id/btnStep"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="步过"
+                    android:textSize="14sp"
+                    android:textColor="#ffffff"
+                    android:background="@drawable/btn_bg_run"
+                    android:minWidth="48dp" />
+
+                <Button
+                    android:id="@+id/btnContinue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="继续"
+                    android:textSize="14sp"
+                    android:textColor="#ffffff"
+                    android:background="@drawable/btn_bg_run"
+                    android:minWidth="48dp" />
+
+                <Button
+                    android:id="@+id/btnBreak"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="断点"
+                    android:textSize="14sp"
+                    android:textColor="#ffffff"
+                    android:background="@drawable/btn_bg"
+                    android:minWidth="48dp" />
+
+                <Button
+                    android:id="@+id/btnStopDebug"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="停止"
+                    android:textSize="14sp"
+                    android:textColor="#ffffff"
+                    android:background="@drawable/btn_bg"
+                    android:minWidth="48dp" />
+
+                <TextView
+                    android:id="@+id/tvDebugStatus"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="6dp"
+                    android:textSize="12sp"
+                    android:textColor="#9cdcfe"
+                    android:maxLines="1"
+                    android:ellipsize="end" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- ==================== 右侧：控制台（默认展开） ==================== -->
+        <LinearLayout
+            android:id="@+id/console"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="42"
+            android:orientation="vertical"
+            android:background="#0d0d0d">
+
+            <!-- 控制台标题栏 + 收起按钮（v1.28.9：加 id，横屏时 MainActivity 对其做顶部安全区避让，避免按钮被状态栏遮挡） -->
+            <LinearLayout
+                android:id="@+id/consoleTitleBar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:background="#1a1a1a"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:paddingHorizontal="10dp"
+                    android:paddingVertical="4dp"
+                    android:text="控制台"
+                    android:textSize="12sp"
+                    android:textColor="#8a8a8a" />
+
+                <TextView
+                    android:id="@+id/btnToggleConsole"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="6dp"
+                    android:text="收起"
+                    android:textSize="12sp"
+                    android:textColor="#9cdcfe"
+                    android:paddingHorizontal="10dp"
+                    android:paddingVertical="4dp" />
+            </LinearLayout>
+
+            <!-- 日志滚动区 -->
+            <ScrollView
+                android:id="@+id/scConsole"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:fillViewport="true">
+
+                <TextView
+                    android:id="@+id/tvConsole"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp"
+                    android:typeface="monospace"
+                    android:textColor="#cccccc"
+                    android:textIsSelectable="true"
+                    android:paddingHorizontal="10dp"
+                    android:paddingVertical="6dp" />
+            </ScrollView>
+
+            <!-- 程序输入行（运行期间出现） -->
+            <LinearLayout
+                android:id="@+id/inputBar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:background="#1a1a1a"
+                android:padding="4dp"
+                android:visibility="gone">
+
+                <EditText
+                    android:id="@+id/etInput"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="#252526"
+                    android:textColor="#d4d4d4"
+                    android:textColorHint="#6a6a6a"
+                    android:textSize="14sp"
+                    android:typeface="monospace"
+                    android:singleLine="true"
+                    android:imeOptions="actionSend"
+                    android:inputType="text"
+                    android:hint="程序等待输入（scanf）…" />
+
+                <Button
+                    android:id="@+id/btnSend"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    android:text="发送"
+                    android:textSize="14sp"
+                    android:textColor="#ffffff"
+                    android:background="@drawable/btn_bg_run"
+                    android:minWidth="48dp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- ==================== 控制台收起后：右边缘竖条（默认隐藏） ==================== -->
+        <LinearLayout
+            android:id="@+id/consoleCollapsed"
+            android:layout_width="28dp"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:background="#1a1a1a"
+            android:gravity="center"
+            android:visibility="gone">
+
+            <!-- 整条都可点击（layout_weight=1 撑满高度），点击后重新展开控制台 -->
+            <TextView
+                android:id="@+id/btnShowConsole"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:text="◀"
+                android:textSize="16sp"
+                android:textColor="#9cdcfe"
+                android:gravity="center" />
+        </LinearLayout>
+    </LinearLayout>
+</FrameLayout>
