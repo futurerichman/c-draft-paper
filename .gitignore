@@ -1,0 +1,23 @@
+# 签名密钥（绝不入库）
+*.keystore
+*.jks
+
+# 二进制运行时资源（从 Release 下载）
+assets/sysroot.zip
+assets/tcc/tcc.gz
+assets/tcc/tcc_runtime.zip
+
+# 构建产物
+*.apk
+*.apks
+
+# 构建临时目录
+.build_*/
+build/
+out/
+
+# IDE
+.idea/
+.vscode/
+*.iml
+.gradle/
